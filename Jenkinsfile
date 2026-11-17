@@ -9,19 +9,26 @@ pipeline {
             }
         }
 
-        stage('Preparation') {
+        stage('Test') {
             steps {
-                echo 'Persiapan CI/CD DompetKu berhasil'
+                bat 'docker build --target test -t dompetku:test .'
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                bat 'docker build --target app -t dompetku:week2 .'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline DompetKu SUCCESS'
+            echo 'Test dan Docker Build berhasil!'
         }
+
         failure {
-            echo 'Pipeline DompetKu FAILED'
+            echo 'Pipeline gagal, periksa Console Output.'
         }
     }
 }
