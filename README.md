@@ -25,58 +25,59 @@ Aplikasi dompet digital untuk kantin kampus.
 - Batas transfer maksimal Rp2.000.000 per hari per akun.
 - Transaksi dengan idempotency key yang sama tidak boleh diproses dua kali.
 
-## Menjalankan Aplikasi Menggunakan Docker
-- Buat file `.env` berdasarkan `.env.example`:
+# Menjalankan Aplikasi Menggunakan Docker
+
+Buat file `.env` berdasarkan `.env.example`:
 
 ```bash
 cp .env.example .env
 ```
 
-- Build Docker image:
+Build Docker image:
 
 ```bash
 docker compose build app
 ```
 
-- Generate application key:
+Generate application key:
 
 ```bash
 docker compose run --rm --no-deps app php artisan key:generate --show
 ```
 
-- Salin hasil key dari terminal dan masukkan ke dalam file `.env`:
+Salin hasil key dari terminal dan masukkan ke dalam file `.env`:
 
 ```env
 APP_KEY=base64:hasil_key_yang_diperoleh
 ```
 
-- Jalankan container:
+Jalankan container:
 
 ```bash
 docker compose up -d
 ```
 
-- Jalankan database migration:
+Jalankan database migration:
 
 ```bash
 docker compose exec app php artisan migrate --force
 ```
 
-- Masukkan data contoh:
+Masukkan data contoh:
 
 ```bash
 docker compose exec app php artisan db:seed --class=WalletSeeder --force
 ```
 
-- Periksa status container:
+Periksa status container:
 
 ```bash
 docker compose ps
 ```
 
 Pastikan:
--- Container `dompetku-app` berstatus `Up`.
--- Container `dompetku-db` berstatus `Up (healthy)`.
+- Container `dompetku-app` berstatus `Up`.
+- Container `dompetku-db` berstatus `Up (healthy)`.
 
 ### Mengakses Aplikasi
 
@@ -87,7 +88,7 @@ Buka browser dan akses:
 
 ### Menghentikan Aplikasi
 
-- Untuk menghentikan seluruh container:
+Untuk menghentikan seluruh container:
 
 ```bash
 docker compose down
@@ -95,19 +96,19 @@ docker compose down
 
 ### Menjalankan Ulang Aplikasi
 
-- Jika container sudah dihentikan:
+Jika container sudah dihentikan:
 
 ```bash
 docker compose up -d
 ```
 
-- Jika terdapat perubahan source code:
+Jika terdapat perubahan source code:
 
 ```bash
 docker compose up -d --build
 ```
 
-- Jika terdapat migration baru:
+Jika terdapat migration baru:
 
 ```bash
 docker compose exec app php artisan migrate --force
