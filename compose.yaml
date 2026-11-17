@@ -1,0 +1,65 @@
+
+services:
+
+  app:
+    build:
+      context: .
+      target: app
+
+    container_name: dompetku-app
+    restart: unless-stopped
+
+    working_dir: /var/www/html
+
+    env_file:
+      - .env
+
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+
+  db:
+    image: mysql:8.0
+
+    container_name: dompetku-db
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-dompetku}
+      MYSQL_USER: ${DB_USERNAME:-dompetku}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-dompetku_password}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+
+    volumes:
+      - db_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    networks:
+      - backend
+
+
+volumes:
+  db_data:
+
+
+networks:
+  frontend:
+    driver: bridge
+
+  backend:
+    driver: bridge
+    internal: true
