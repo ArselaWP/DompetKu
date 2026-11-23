@@ -123,3 +123,37 @@ docker compose exec app php artisan migrate --force
 - Database menggunakan persistent volume sehingga data tetap tersimpan meskipun container dihentikan.
 - Jalankan `WalletSeeder` hanya jika membutuhkan data contoh pada database baru.
 - Jangan gunakan `docker compose down -v` jika ingin mempertahankan data database.
+
+## Pengujian QA
+
+Jalankan dari folder proyek saat Docker Desktop aktif:
+
+```bash
+docker build --target test --progress=plain -t dompetku:test .
+```
+
+Target `test` memasang dependensi dan menjalankan `php artisan test` dengan PHP 8.3. PHPUnit memakai SQLite in-memory dari `phpunit.xml`, sehingga perintah ini dapat dijalankan tanpa menyalakan MySQL. Build selesai dengan kode keluar 0 jika semua langkah, termasuk test, berhasil.
+
+Untuk menjalankan ulang suite dan melihat ringkasan PHPUnit dari image yang sudah dibangun:
+
+```bash
+docker run --rm dompetku:test php artisan test
+```
+
+- [Fitur dan aturan bisnis](docs/fitur-aturan-bisnis.md) memuat kriteria penerimaan.
+- [Rencana pengujian](docs/test-plan.md) memuat skenario, hasil aktual, dan status tiap pengujian.
+
+## Alur CI/CD di Jenkins
+
+Alur pada `Jenkinsfile` saat ini mencakup pengambilan kode, pengujian, dan pembuatan image aplikasi.
+
+```mermaid
+flowchart TD
+    A["Checkout dari GitHub"] --> B["Test: build target test dan jalankan PHPUnit"]
+    B -->|Lulus| C["Build Image: buat dompetku:week2"]
+    B -->|Gagal| D["Build Image dilewati. Lihat Console Output"]
+    C -->|Berhasil| E["Pipeline berhasil"]
+    C -->|Gagal| F["Pipeline gagal. Lihat Console Output"]
+```
+
+Untuk memeriksa hasil PHPUnit di Jenkins, buka **Console Output** pada tahap **Test**. Tahap **Build Image** membuat image `dompetku:week2` pada Docker agent Jenkins.
